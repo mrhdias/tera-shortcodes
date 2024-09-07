@@ -1,0 +1,15 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<title>Shortcode Test</title>
+</head>
+<body>
+{{ shortcode(display="my_shortcode", foo="bar", bar="bing") | safe }}
+<br>
+{{ shortcode(display="another_shortcode", width="200", height="300", image_src="https://picsum.photos/210/300") | safe }}
+<div style="width: fit-content;margin: 0 auto; margin-top: 20px;">
+    <h2>Products</h2>
+    {{ shortcode(display="products", limit="4", orderby="price") | safe }}
+</div>
+</body>
+</html>

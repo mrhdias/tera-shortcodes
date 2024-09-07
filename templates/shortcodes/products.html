@@ -1,0 +1,35 @@
+<style>
+.products-slideshow {
+    display: flex;
+    list-style: none;
+    flex-direction: row;
+    justify-content: center;
+    gap: 20px;
+    padding: 0;
+    margin: 0;
+}
+.products-slideshow > li > a {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    align-items: center;
+    text-decoration: none;
+    color: #424242;
+}
+.products-slideshow h3 {
+    margin: 0;
+}
+</style>
+<ul class="products-slideshow">
+    {% for product in products -%}
+        <li>
+            <a href="#">
+                <img src="{{ product.image_url }}" alt="{{ product.name }}"/>
+                <h3>{{ product.name }}</h3>
+                <span>{{ product.price }} €</span>
+            </a>
+        </li>
+    {%- endfor %}
+</ul>
+
+<br>
