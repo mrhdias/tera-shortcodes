@@ -1,7 +1,7 @@
 # tera-shortcodes
 Tera Shortcodes in Rust: A WordPress-Like Implementation
 
-The goal of this project is to bring the functionality of WordPress shortcodes to Tera template engine, enabling them to be inserted into templates to display content or functionality provided by the shortcode.
+The goal of this library is to bring the functionality of WordPress shortcodes to Tera template engine, enabling them to be inserted into templates to display content or functionality provided by the shortcode.
 
 ```html
 {{ shortcode(display="myshortcode", foo="bar", bar="bing") | safe }}
@@ -14,8 +14,10 @@ Clone the repository and edit the test template if you wish. In the products sho
 ```sh
 git clone https://github.com/mrhdias/tera-shortcodes
 cd tera-shortcodes
-nano -w templates/test_shortcode.html
-cargo run
+cargo build
+nano -w examples/templates/test_shortcode.html
+cargo run --example app
+curl http://127.0.0.1:8080/test
 ```
 
 ## Benchemarks

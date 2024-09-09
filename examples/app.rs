@@ -2,7 +2,7 @@
 // Axum/Tera & Real Shortcodes in Rust: A WordPress-Like Implementation
 //
 
-mod shortcodes;
+use tera_shortcodes;
 
 use axum::{
     extract::{Extension, Request, Json, Query},
@@ -13,7 +13,6 @@ use axum::{
 };
 
 use serde::{Serialize, Deserialize};
-use shortcodes::Shortcodes;
 use tera::{Tera, Context};
 use std::collections::HashMap;
 
@@ -54,11 +53,17 @@ fn products_shortcode_fn(
 
     let url = &format!("http://{}/products?{}", ADDRESS, parameters.join("&"));
 
-    shortcodes::fetch_shortcode_js(
+    tera_shortcodes::fetch_shortcode(
         url, 
         Some("get"), 
         None,
     )
+
+    // shortcodes::fetch_shortcode_js(
+    //    url, 
+    //    Some("get"), 
+    //    None,
+    // )
 }
 
 async fn products(
@@ -128,6 +133,7 @@ async fn products(
     let mut data = Context::new();
     data.insert("products", &products_by_limit);
     let rendered = tera.render("shortcodes/products.html", &data).unwrap();
+
     Html(rendered)
 }
 
@@ -185,21 +191,11 @@ fn my_shortcode_fn(
 
     let url = &format!("http://{}/data", ADDRESS);
 
-    let block_in_place = false; // only for testing purposes
-
-    if block_in_place {
-        shortcodes::fetch_shortcode(
-            url, 
-            Some("post"),
-            Some(&json_body)
-        )
-    } else {
-        shortcodes::fetch_shortcode_js(
-            url, 
-            Some("post"), 
-            Some(&json_body)
-        )
-    }
+    tera_shortcodes::fetch_shortcode_js(
+        url, 
+        Some("post"),
+        Some(&json_body)
+    )
 }
 
 #[derive(Serialize, Deserialize)]
@@ -238,12 +234,16 @@ async fn test(
 #[tokio::main]
 async fn main() {
 
-    let mut shortcodes = Shortcodes::new();
+    let cache_dir = std::path::Path::new("examples")
+        .join("cache")
+        .to_path_buf();
+
+    let mut shortcodes = tera_shortcodes::Shortcodes::new(cache_dir, true);
     shortcodes.list.insert("my_shortcode".to_owned(), my_shortcode_fn);
     shortcodes.list.insert("another_shortcode".to_owned(), another_shortcode_fn);
     shortcodes.list.insert("products".to_owned(), products_shortcode_fn);
 
-    let mut tera = Tera::new("templates/**/*").unwrap();
+    let mut tera = Tera::new("examples/templates/**/*").unwrap();
 
     // Register the custom function
     tera.register_function("shortcode", shortcodes);

@@ -2,12 +2,17 @@
 name = "tera-shortcodes"
 version = "0.1.0"
 edition = "2021"
+description = "Tera Shortcodes: A WordPress-Like Implementation"
+license = "MIT"
 
 [dependencies]
-axum = "0.7.5"
+chrono = "0.4.38"
+md5 = "0.7.0"
 reqwest = { version = "0.12.7", features = ["json"] }
-serde = { version = "1.0.210", features = ["derive"] }
-serde_json = "1.0.128"
 tera = { version = "1.20.0", features = ["builtins"] }
 tokio = { version = "1.40.0", features = ["rt-multi-thread"] }
 
+[dev-dependencies]
+axum = "0.7.5"
+serde = { version = "1.0.210", features = ["derive"] }
+serde_json = "1.0.128"
