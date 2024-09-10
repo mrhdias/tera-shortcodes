@@ -6,8 +6,6 @@ description = "Tera Shortcodes: A WordPress-Like Implementation"
 license = "MIT"
 
 [dependencies]
-chrono = "0.4.38"
-md5 = "0.7.0"
 reqwest = { version = "0.12.7", features = ["json"] }
 tera = { version = "1.20.0", features = ["builtins"] }
 tokio = { version = "1.40.0", features = ["rt-multi-thread"] }

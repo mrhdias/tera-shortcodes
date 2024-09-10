@@ -51,15 +51,15 @@ fn products_shortcode_fn(
             .trim_matches(|c| c == '"' || c == '\'')));
     }
 
-    let url = &format!("http://{}/products?{}", ADDRESS, parameters.join("&"));
+    let url = format!("http://{}/products?{}", ADDRESS, parameters.join("&"));
 
-    tera_shortcodes::fetch_shortcode(
-        url, 
+    tera_shortcodes::fetch_shortcode_js(
+        &url,
         Some("get"), 
         None,
     )
 
-    // shortcodes::fetch_shortcode_js(
+    // shortcodes::fetch_shortcode(
     //    url, 
     //    Some("get"), 
     //    None,
@@ -189,10 +189,10 @@ fn my_shortcode_fn(
         bar: bar.to_string(),
     }).unwrap();
 
-    let url = &format!("http://{}/data", ADDRESS);
+    let url = format!("http://{}/data", ADDRESS);
 
     tera_shortcodes::fetch_shortcode_js(
-        url, 
+        &url,
         Some("post"),
         Some(&json_body)
     )
@@ -234,14 +234,10 @@ async fn test(
 #[tokio::main]
 async fn main() {
 
-    let cache_dir = std::path::Path::new("examples")
-        .join("cache")
-        .to_path_buf();
-
-    let mut shortcodes = tera_shortcodes::Shortcodes::new(cache_dir, true);
-    shortcodes.list.insert("my_shortcode".to_owned(), my_shortcode_fn);
-    shortcodes.list.insert("another_shortcode".to_owned(), another_shortcode_fn);
-    shortcodes.list.insert("products".to_owned(), products_shortcode_fn);
+    let shortcodes = tera_shortcodes::Shortcodes::new()
+        .register("my_shortcode", my_shortcode_fn)
+        .register("another_shortcode", another_shortcode_fn)
+        .register("products", products_shortcode_fn);
 
     let mut tera = Tera::new("examples/templates/**/*").unwrap();
 

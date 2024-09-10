@@ -4,12 +4,13 @@
 <title>Shortcode Test</title>
 </head>
 <body>
-{{ shortcode(display="my_shortcode", foo="bar", bar="bing", rotate="60") | safe }}
+{{ shortcode(display="my_shortcode", foo="bar", bar="bing") | safe }}
 <br>
 {{ shortcode(display="another_shortcode", width="200", height="300", image_src="https://picsum.photos/210/300") | safe }}
+<br>
 <div style="width: fit-content;margin: 0 auto; margin-top: 20px;">
     <h2>Products</h2>
-    {{ shortcode(display="products", limit="4", orderby="price", rotate="60") | safe }}
+    {{ shortcode(display="products", limit="4", orderby="price") | safe }}
 </div>
 </body>
 </html>

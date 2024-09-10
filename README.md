@@ -20,6 +20,23 @@ cargo run --example app
 curl http://127.0.0.1:8080/test
 ```
 
+## Usage
+
+```html
+{{ shortcode(display="my_shortcode", foo="bar", bar="bing") | safe }}
+```
+
+```rust
+let shortcodes = tera_shortcodes::Shortcodes::new()
+  .register("my_shortcode", my_shortcode_fn)
+  .register("another_shortcode", another_shortcode_fn);
+
+let mut tera = Tera::new("templates/**/*").unwrap();
+
+// Register the custom function
+tera.register_function("shortcode", shortcodes);
+```
+
 ## Benchemarks
 
 Fetch shortcode in Rust with `block_in_place` to run the async function.
@@ -35,7 +52,7 @@ Running 30s test @ http://127.0.0.1:8080/test
 Requests/sec:    193.55
 Transfer/sec:     61.05KB
 ```
-Fetch a shortcode using an auxiliary function in JavaScript.
+Fetch a shortcode using an `auxiliary function` in JavaScript.
 ```sh
 wrk -t12 -c400 -d30s http://127.0.0.1:8080/test
 Running 30s test @ http://127.0.0.1:8080/test
