@@ -9,6 +9,7 @@ The goal of this library is to bring the functionality of WordPress shortcodes t
 
 ## How to perform a test?
 
+An example is provided to demonstrate how a shortcode is implemented.
 Clone the repository and edit the test template if you wish. In the products shortcode, you can change the limit and order.
 
 ```sh
@@ -22,13 +23,43 @@ curl http://127.0.0.1:8080/test
 
 ## Usage
 
+An example of shortcode:
 ```html
 {{ shortcode(display="my_shortcode", foo="bar", bar="bing") | safe }}
 ```
 
 ```rust
+use tera_shortcodes;
+
 let shortcodes = tera_shortcodes::Shortcodes::new()
-  .register("my_shortcode", my_shortcode_fn)
+  .register("my_shortcode", |args| -> String {
+
+    let foo = match args.get("foo") {
+      Some(value) => value.as_str().unwrap()
+        .trim_matches(|c| c == '"' || c == '\''),
+      None => "no foo",
+    };
+
+    let bar = match args.get("bar") {
+      Some(value) => value.as_str().unwrap()
+        .trim_matches(|c| c == '"' || c == '\''),
+      None => "no bar",
+    };
+
+    let json_body = serde_json::to_string(&DataTest {
+      foo: foo.to_string(),
+      bar: bar.to_string(),
+    }).unwrap();
+  
+    // axum route that receives the data from the shortcode
+    let url = format!("http://{}/data", ADDRESS);
+        
+    tera_shortcodes::fetch_shortcode_js(
+      &url,
+      Some("post"),
+      Some(&json_body)
+    )
+  })
   .register("another_shortcode", another_shortcode_fn);
 
 let mut tera = Tera::new("templates/**/*").unwrap();

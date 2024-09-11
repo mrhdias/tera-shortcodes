@@ -165,39 +165,6 @@ fn another_shortcode_fn(
     format!(r#"<img src="{}" width="{}" height="{}">"#, image_src, width, height)
 }
 
-fn my_shortcode_fn(
-    args: &HashMap<String, tera::Value>,
-) -> String {
-
-    let foo = match args.get("foo") {
-        Some(value) => value
-            .as_str()
-            .unwrap()
-            .trim_matches(|c| c == '"' || c == '\''),
-        None => "no foo",
-    };
-    let bar = match args.get("bar") {
-        Some(value) => value
-            .as_str()
-            .unwrap()
-            .trim_matches(|c| c == '"' || c == '\''),
-        None => "no bar",
-    };
-
-    let json_body = serde_json::to_string(&DataTest {
-        foo: foo.to_string(),
-        bar: bar.to_string(),
-    }).unwrap();
-
-    let url = format!("http://{}/data", ADDRESS);
-
-    tera_shortcodes::fetch_shortcode_js(
-        &url,
-        Some("post"),
-        Some(&json_body)
-    )
-}
-
 #[derive(Serialize, Deserialize)]
 struct DataTest {
     foo: String,
@@ -235,7 +202,35 @@ async fn test(
 async fn main() {
 
     let shortcodes = tera_shortcodes::Shortcodes::new()
-        .register("my_shortcode", my_shortcode_fn)
+        .register("my_shortcode", |args| -> String {
+            let foo = match args.get("foo") {
+                Some(value) => value
+                    .as_str()
+                    .unwrap()
+                    .trim_matches(|c| c == '"' || c == '\''),
+                None => "no foo",
+            };
+            let bar = match args.get("bar") {
+                Some(value) => value
+                    .as_str()
+                    .unwrap()
+                    .trim_matches(|c| c == '"' || c == '\''),
+                None => "no bar",
+            };
+        
+            let json_body = serde_json::to_string(&DataTest {
+                foo: foo.to_string(),
+                bar: bar.to_string(),
+            }).unwrap();
+        
+            let url = format!("http://{}/data", ADDRESS);
+        
+            tera_shortcodes::fetch_shortcode_js(
+                &url,
+                Some("post"),
+                Some(&json_body)
+            )
+        })
         .register("another_shortcode", another_shortcode_fn)
         .register("products", products_shortcode_fn);
 

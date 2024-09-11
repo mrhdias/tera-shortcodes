@@ -5,6 +5,8 @@
 use tera::{Result, Function};
 use std::collections::HashMap;
 
+const ROBOTS_TXT: &'static str = "Link for Robots (No JavaScript)";
+
 pub struct Shortcodes {
     pub functions: HashMap<String, fn(&HashMap<String, tera::Value>) -> String>,
 }
@@ -102,7 +104,7 @@ const response = await fetch(request);"#, url, json_body),
     fetch_js);
 
     if method.to_lowercase().as_str() == "get" {
-        js_code.to_string() + &format!(r#"<noscript><a href="{}">Link for Robots (No JavaScript)</a></noscript>"#, url)
+        js_code.to_string() + &format!(r#"<noscript><a href="{}">{}</a></noscript>"#, url, ROBOTS_TXT)
     } else {
         js_code
     }
