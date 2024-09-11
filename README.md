@@ -3,6 +3,8 @@ Tera Shortcodes in Rust: A WordPress-Like Implementation
 
 The goal of this library is to bring the functionality of WordPress shortcodes to Tera template engine, enabling them to be inserted into templates to display content or functionality provided by the shortcode.
 
+[![Rust](https://github.com/mrhdias/tera-shortcodes/actions/workflows/rust.yml/badge.svg)](https://github.com/mrhdias/tera-shortcodes/actions/workflows/rust.yml)
+
 ```html
 {{ shortcode(display="myshortcode", foo="bar", bar="bing") | safe }}
 ```
