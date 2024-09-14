@@ -245,14 +245,21 @@ async fn main() {
             "Hello world!"
         }))
         .route("/test", get(test))
-        .route("/data", post(data))
-        .route("/products", get(products))
+        .route("/data", post(data)) // content to shorcode
+        .route("/products", get(products)) // content to shorcode
         .layer(Extension(tera));
 
     // Run the server
     let listener = tokio::net::TcpListener::bind(ADDRESS)
         .await
         .unwrap();
+
+    let url = format!("http://{}/test", ADDRESS);
+    if let Err(e) = open::that(&url) {
+        eprintln!("Failed to open URL: {}", e);
+    }
+    println!("Point your browser to this url: {} if not opened automatically", url);
+
     axum::serve(listener, ServiceExt::<Request>::into_make_service(app))
         .await
         .unwrap();
