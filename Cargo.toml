@@ -1,11 +1,11 @@
 [package]
 name = "tera-shortcodes"
-version = "0.1.1"
+version = "0.1.2"
 edition = "2021"
 description = "Tera Shortcodes: A WordPress-Like Implementation"
 keywords = ["tera", "template", "html", "markup"]
 categories = ["template-engine"]
-repository = "https://github.com/seanmonstar/reqwest"
+repository = "https://github.com/mrhdias/tera-shortcodes"
 authors = ["Henrique Dias <mrhdias@gmail.com>"]
 readme = "README.md"
 license = "MIT"
