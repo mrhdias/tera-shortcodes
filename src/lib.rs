@@ -160,9 +160,9 @@ pub fn fetch_shortcode_js(
         "post" => format!(r#"
 const request = new Request("{}", {{
     headers: (() => {{
-        const myHeaders = new Headers();
-        myHeaders.append("Content-Type", "application/json");
-        return myHeaders;
+        const headers = new Headers();
+        headers.append("Content-Type", "application/json");
+        return headers;
     }})(),
     method: "POST",
     body: JSON.stringify({}),
