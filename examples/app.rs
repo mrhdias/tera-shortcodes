@@ -57,6 +57,7 @@ fn products_shortcode_fn(
         &url,
         Some("get"), 
         None,
+        Some("Products"),
     )
 
     // shortcodes::fetch_shortcode(
@@ -228,7 +229,8 @@ async fn main() {
             tera_shortcodes::fetch_shortcode_js(
                 &url,
                 Some("post"),
-                Some(&json_body)
+                Some(&json_body),
+                None,
             )
         })
         .register("another_shortcode", another_shortcode_fn)
