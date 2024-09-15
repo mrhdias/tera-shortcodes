@@ -206,7 +206,7 @@ Invalid method {} for url {} (only GET and POST methods available)
     }
 }
 
-/// Sends an HTTP request to the provided URL using either the `GET`` or `POST`` method and returns the response as a String.
+/// Sends an HTTP request to the provided URL using either the `GET` or `POST` method and returns the response as a String.
 /// This function handles asynchronous requests but executes them in a synchronous context using Tokio function `block_in_place`.
 /// Note: This function is slow. For better performance, consider using the fetch_shortcode_js function instead.
 ///
