@@ -6,7 +6,7 @@ The goal of this library is to bring WordPress-style shortcodes to the Tera temp
 [![Rust](https://github.com/mrhdias/tera-shortcodes/actions/workflows/rust.yml/badge.svg)](https://github.com/mrhdias/tera-shortcodes/actions/workflows/rust.yml)
 
 ```html
-{{ shortcode(display="myshortcode", foo="bar", bar="bing") | safe }}
+{{ shortcode(display="myshortcode", foo="bar", bar="bing", jscaller="true") | safe }}
 ```
 
 ## How to perform a test?
@@ -27,7 +27,7 @@ curl http://127.0.0.1:8080/test
 
 An example of shortcode:
 ```html
-{{ shortcode(display="my_shortcode", foo="bar", bar="bing") | safe }}
+{{ shortcode(display="my_shortcode", foo="bar", bar="bing", jscaller="true") | safe }}
 ```
 
 ```rust
@@ -35,6 +35,16 @@ use tera_shortcodes;
 
 let shortcodes = tera_shortcodes::Shortcodes::new()
   .register("my_shortcode", |args| -> String {
+
+    let js_caller = match args.get("jscaller") {
+        Some(value) => value
+            .as_str()
+            .unwrap()
+            .trim_matches(|c| c == '"' || c == '\'')
+            .parse()
+            .unwrap_or(false),
+        None => false,
+    };
 
     let foo = match args.get("foo") {
       Some(value) => value.as_str().unwrap()
@@ -55,12 +65,21 @@ let shortcodes = tera_shortcodes::Shortcodes::new()
   
     // axum route that receives the data from the shortcode
     let url = format!("http://{}/data", ADDRESS);
-        
-    tera_shortcodes::fetch_shortcode_js(
-      &url,
-      Some("post"),
-      Some(&json_body)
-    )
+
+    if js_caller {
+      tera_shortcodes::fetch_shortcode_js(
+        &url,
+        Some("post"),
+        Some(&json_body),
+        None,
+      )
+    } else {
+      tera_shortcodes::fetch_shortcode(
+        &url,
+        Some("post"),
+        Some(&json_body),
+      )
+    }
   })
   .register("another_shortcode", another_shortcode_fn);
 
@@ -74,26 +93,23 @@ tera.register_function("shortcode", shortcodes);
 
 Fetch shortcode in Rust with `block_in_place` to run the async function.
 ```sh
-wrk -t12 -c400 -d30s http://127.0.0.1:8080/test
 Running 30s test @ http://127.0.0.1:8080/test
   12 threads and 400 connections
   Thread Stats   Avg      Stdev     Max   +/- Stdev
-    Latency     1.52s   339.42ms   2.00s    66.52%
-    Req/Sec    18.99     13.10    80.00     77.55%
-  5824 requests in 30.09s, 1.79MB read
-  Socket errors: connect 0, read 0, write 0, timeout 2479
-Requests/sec:    193.55
-Transfer/sec:     61.05KB
+    Latency   250.98ms   60.48ms 528.39ms   68.72%
+    Req/Sec   131.94     31.32   260.00     68.57%
+  47193 requests in 30.10s, 84.30MB read
+Requests/sec:   1567.81
+Transfer/sec:      2.80MB
 ```
 Fetch a shortcode using an `auxiliary function` in JavaScript.
 ```sh
-wrk -t12 -c400 -d30s http://127.0.0.1:8080/test
 Running 30s test @ http://127.0.0.1:8080/test
   12 threads and 400 connections
   Thread Stats   Avg      Stdev     Max   +/- Stdev
-    Latency    47.65ms   19.24ms 135.45ms   68.79%
-    Req/Sec   696.16     57.63     2.03k    78.89%
-  249698 requests in 30.07s, 230.27MB read
-Requests/sec:   8303.94
-Transfer/sec:      7.66MB
+    Latency    57.46ms   22.86ms 162.02ms   69.30%
+    Req/Sec   577.12     48.80     1.43k    73.41%
+  207147 requests in 30.10s, 437.77MB read
+Requests/sec:   6882.17
+Transfer/sec:     14.54MB
 ```

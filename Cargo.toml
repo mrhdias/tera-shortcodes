@@ -1,6 +1,6 @@
 [package]
 name = "tera-shortcodes"
-version = "0.1.4"
+version = "0.1.5"
 edition = "2021"
 description = "Tera Shortcodes: A WordPress-Like Implementation"
 keywords = ["tera", "template", "html", "markup"]
@@ -11,6 +11,7 @@ readme = "README.md"
 license = "MIT"
 
 [dependencies]
+once_cell = "1.19.0"
 reqwest = { version = "0.12.7", features = ["json"] }
 tera = { version = "1.20.0", features = ["builtins"] }
 tokio = { version = "1.40.0", features = ["rt-multi-thread"] }

@@ -37,6 +37,16 @@ fn products_shortcode_fn(
     args: &HashMap<String, tera::Value>,
 ) -> String {
 
+    let js_caller = match args.get("jscaller") {
+        Some(value) => value
+            .as_str()
+            .unwrap()
+            .trim_matches(|c| c == '"' || c == '\'')
+            .parse()
+            .unwrap_or(false),
+        None => false,
+    };
+
     let mut parameters = vec![];
 
     if let Some(limit) = args.get("limit") {
@@ -53,18 +63,20 @@ fn products_shortcode_fn(
 
     let url = format!("http://{}/products?{}", ADDRESS, parameters.join("&"));
 
-    tera_shortcodes::fetch_shortcode_js(
-        &url,
-        Some("get"), 
-        None,
-        Some("Products"),
-    )
-
-    // shortcodes::fetch_shortcode(
-    //    url, 
-    //    Some("get"), 
-    //    None,
-    // )
+    if js_caller {
+        tera_shortcodes::fetch_shortcode_js(
+            &url,
+            Some("get"), 
+            None,
+            Some("Products"),
+        )
+    } else {
+        tera_shortcodes::fetch_shortcode(
+            &url, 
+            Some("get"), 
+            None,
+        )
+    }
 }
 
 async fn products(
@@ -204,6 +216,17 @@ async fn main() {
 
     let shortcodes = tera_shortcodes::Shortcodes::new()
         .register("my_shortcode", |args| -> String {
+
+            let js_caller = match args.get("jscaller") {
+                Some(value) => value
+                    .as_str()
+                    .unwrap()
+                    .trim_matches(|c| c == '"' || c == '\'')
+                    .parse()
+                    .unwrap_or(false),
+                None => false,
+            };
+
             let foo = match args.get("foo") {
                 Some(value) => value
                     .as_str()
@@ -226,12 +249,20 @@ async fn main() {
         
             let url = format!("http://{}/data", ADDRESS);
         
-            tera_shortcodes::fetch_shortcode_js(
-                &url,
-                Some("post"),
-                Some(&json_body),
-                None,
-            )
+            if js_caller {
+                tera_shortcodes::fetch_shortcode_js(
+                    &url,
+                    Some("post"),
+                    Some(&json_body),
+                    None,
+                )
+            } else {
+                tera_shortcodes::fetch_shortcode(
+                    &url,
+                    Some("post"),
+                    Some(&json_body),
+                )
+            }
         })
         .register("another_shortcode", another_shortcode_fn)
         .register("products", products_shortcode_fn);

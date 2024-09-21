@@ -4,6 +4,9 @@
 
 use tera::{Result, Function};
 use std::collections::HashMap;
+use once_cell::sync::Lazy;
+
+static CLIENT: Lazy<reqwest::Client> = Lazy::new(|| reqwest::Client::new());
 
 // const ROBOTS_TXT: &'static str = "Link for Robots (No JavaScript)";
 
@@ -263,20 +266,18 @@ pub fn fetch_shortcode(
     let method = method.unwrap_or("GET");
     let json_body = json_body.unwrap_or("{}");
 
-    let client = reqwest::Client::new();
-
     let data_to_route = async {
         let response = match method.to_lowercase().as_str() {
-            "get" => client.get(url)
+            "get" => CLIENT.get(url)
                 .send()
                 .await,
-            "post" => client.post(url)
+            "post" => CLIENT.post(url)
                 .header("Content-Type", "application/json")
                 .body(json_body.to_owned())
                 .send()
                 .await,
-                _ => return format!("Invalid method: {}", method),
-            };
+            _ => return format!("Invalid method: {}", method),
+        };
 
         match response {
             Ok(res) => {

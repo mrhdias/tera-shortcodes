@@ -4,13 +4,13 @@
 <title>Shortcode Test</title>
 </head>
 <body>
-{{ shortcode(display="my_shortcode", foo="bar", bar="bing") | safe }}
+{{ shortcode(display="my_shortcode", foo="bar", bar="bing", jscaller="true") | safe }}
 <br>
-{{ shortcode(display="another_shortcode", width="200", height="300", image_src="https://picsum.photos/210/300") | safe }}
+{{ shortcode(display="another_shortcode", width="200", height="300", image_src="https://picsum.photos/210/300", jscaller="true") | safe }}
 <br>
 <div style="width: fit-content;margin: 0 auto; margin-top: 20px;">
     <h2>Products</h2>
-    {{ shortcode(display="products", limit="4", orderby="price") | safe }}
+    {{ shortcode(display="products", limit="4", orderby="price", jscaller="true") | safe }}
 </div>
 </body>
 </html>
