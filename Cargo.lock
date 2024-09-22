@@ -1489,7 +1489,7 @@ dependencies = [
 
 [[package]]
 name = "tera-shortcodes"
-version = "0.1.5"
+version = "0.1.6"
 dependencies = [
  "axum",
  "once_cell",

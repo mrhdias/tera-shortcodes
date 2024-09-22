@@ -103,7 +103,8 @@ impl Function for Shortcodes {
 
 /// Generates a JavaScript snippet that asynchronously fetches data from a URL using either the GET
 /// or POST HTTP method and injects the response into the DOM. The function also provides fallback
-/// content for crawlers/robots that do not support JavaScript.
+/// content for crawlers/robots that do not support JavaScript. If the response has JavaScript code
+/// like <script>console.log('test');</script>, it will be executable.
 ///
 /// # Parameters
 ///
@@ -171,11 +172,13 @@ const request = new Request("{}", {{
     body: JSON.stringify({}),
 }});
 const response = await fetch(request);"#, url, json_body),
-        _ => return format!(r#"<output style="background-color:#F44336;color:#fff;padding:6px;">
+        _ => return format!(r#"<output style="background-color:#f44336;color:#fff;padding:6px;">
 Invalid method {} for url {} (only GET and POST methods available)
 </output>"#, method, url),
     };
 
+    // reScript function ia a trick to make the Javascript code work when inserted.
+    // Replace it with another clone element script.
     let js_code = format!(r#"<script>
 (function () {{
     async function fetchShortcodeData() {{
@@ -190,11 +193,28 @@ Invalid method {} for url {} (only GET and POST methods available)
             return "";
         }}
     }}
+    function reScript(helper) {{
+        for (const node of helper.childNodes) {{
+            if (node.hasChildNodes()) {{
+                reScript(node);
+            }}
+            if (node.nodeName === 'SCRIPT') {{
+                const script = document.createElement('script');
+                script.type = "text/javascript";
+                script.textContent = node.textContent;
+                node.replaceWith(script);
+            }}
+        }}
+    }}
     (async () => {{
         const currentScript = document.currentScript;
         const content = await fetchShortcodeData();
         // console.log(content);
-        currentScript.insertAdjacentHTML('beforebegin', content);
+        const helper = document.createElement('div');
+        helper.id = 'helper';
+        helper.innerHTML = content;
+        reScript(helper);
+        currentScript.after(...helper.childNodes);
         currentScript.remove();
     }})();
 }})();
