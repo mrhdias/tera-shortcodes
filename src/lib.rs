@@ -160,66 +160,19 @@ pub fn fetch_shortcode_js(
     let json_body = json_body.unwrap_or("{}");
 
     let fetch_js = match method.to_lowercase().as_str() {
-        "get" => format!(r#"const response = await fetch("{}");"#, url),
-        "post" => format!(r#"
-const request = new Request("{}", {{
-    headers: (() => {{
-        const headers = new Headers();
-        headers.append("Content-Type", "application/json");
-        return headers;
-    }})(),
-    method: "POST",
-    body: JSON.stringify({}),
-}});
-const response = await fetch(request);"#, url, json_body),
+        "get" => format!(r#"const r=await fetch("{}");"#, url),
+        "post" => format!(r#"const q=new Request('{}',{{headers:(()=>{{const h=new Headers();h.append('Content-Type','application/json');return h;}})(),method:'POST',body:JSON.stringify({})}});const r=await fetch(q);"#,
+            url, json_body),
         _ => return format!(r#"<output style="background-color:#f44336;color:#fff;padding:6px;">
 Invalid method {} for url {} (only GET and POST methods available)
 </output>"#, method, url),
     };
 
-    // reScript function ia a trick to make the Javascript code work when inserted.
+    // The non-minified full code of this JavaScript script can be found in the js directory located in the root directory.
+    // reScript function is a trick to make the Javascript code work when inserted.
     // Replace it with another clone element script.
-    let js_code = format!(r#"<script>
-(function () {{
-    async function fetchShortcodeData() {{
-        try {{
-            {}
-            if (!response.ok) {{
-                throw new Error(`HTTP error! Status: ${{response.status}}`);
-            }}
-            return await response.text();
-        }} catch (error) {{
-            console.error("Fetch failed:", error);
-            return "";
-        }}
-    }}
-    function reScript(helper) {{
-        for (const node of helper.childNodes) {{
-            if (node.hasChildNodes()) {{
-                reScript(node);
-            }}
-            if (node.nodeName === 'SCRIPT') {{
-                const script = document.createElement('script');
-                script.type = "text/javascript";
-                script.textContent = node.textContent;
-                node.replaceWith(script);
-            }}
-        }}
-    }}
-    (async () => {{
-        const currentScript = document.currentScript;
-        const content = await fetchShortcodeData();
-        // console.log(content);
-        const helper = document.createElement('div');
-        helper.id = 'helper';
-        helper.innerHTML = content;
-        reScript(helper);
-        currentScript.after(...helper.childNodes);
-        currentScript.remove();
-    }})();
-}})();
-</script>"#,
-    fetch_js);
+    let js_code = format!(r#"<script>(function(){{async function f(){{try{{{}if(!r.ok){{throw new Error(`HTTP error! Status: ${{r.status}}`);}}return await r.text();}}catch(error){{console.error('Fetch failed:',error);return '';}}}}function s(h){{for(const n of h.childNodes){{if(n.hasChildNodes()){{s(n);}}if(n.nodeName==='SCRIPT'){{const e=document.createElement('script');e.type='text/javascript';e.textContent=n.textContent;n.replaceWith(e);}}}}}}(async ()=>{{const e=document.currentScript;const c=await f();const h=document.createElement('div');h.id='helper';h.innerHTML=c;s(h);e.after(...h.childNodes);e.remove();}})();}})();</script>"#,
+        fetch_js);
 
     if method.to_lowercase().as_str() == "get" && alt.is_some() {
         let alt = alt.unwrap();
